@@ -6,6 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type SignupInput struct {
+	name         string
+	email        string
+	PasswordHash string
+}
+
 func SignupHandler(c *gin.Context) {
 	var user models.User
 

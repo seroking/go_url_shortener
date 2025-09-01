@@ -9,6 +9,7 @@ import (
 
 func main() {
 	database.Connect()
+	database.SeedAdmin(database.DB)
 	r := gin.Default()
 
 	r.GET("/ping", func(c *gin.Context) {
