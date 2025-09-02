@@ -16,7 +16,9 @@ func main() {
 		c.JSON(200, gin.H{"message": "pong"})
 	})
 
-	r.POST("/signup", handlers.SignupHandler)
+	r.POST("/signup", func(c *gin.Context) {
+		handlers.SignupHandler(c, database.DB)
+	})
 	r.POST("/signin", handlers.SigninHandler)
 	r.Run(":8080")
 }
