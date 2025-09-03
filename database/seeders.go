@@ -30,11 +30,15 @@ func SeedAdmin(db *gorm.DB) {
 		if err != nil {
 			log.Fatal("password check failed:", err)
 		}
-		db.Create(&models.User{
+		admin = models.User{
 			Username:     username,
 			Email:        email,
 			PasswordHash: string(hashedpassword),
 			Role:         role,
-		})
+		}
+		if db.Create(&admin).Error != nil {
+			log.Fatal("failed to create admin user:", err)
+		}
+
 	}
 }

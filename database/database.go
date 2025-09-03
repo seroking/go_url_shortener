@@ -2,8 +2,11 @@ package database
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"url_shortener/models"
 
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -11,7 +14,11 @@ import (
 var DB *gorm.DB
 
 func Connect() {
-	dsn := "root:mangaka2004@tcp(localhost:3306)/shortener?charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=false"
+	godotenv.Load()
+	dsn := os.Getenv("DB_DSN")
+	if dsn == "" {
+		log.Fatal("DB_DSN not set in environment")
+	}
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(fmt.Sprintf("failed to connect database: %v", err))

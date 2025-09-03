@@ -19,6 +19,8 @@ func main() {
 	r.POST("/signup", func(c *gin.Context) {
 		handlers.SignupHandler(c, database.DB)
 	})
-	r.POST("/signin", handlers.SigninHandler)
+	r.POST("/signin", func(c *gin.Context) {
+		handlers.SigninHandler(c, database.DB)
+	})
 	r.Run(":8080")
 }
