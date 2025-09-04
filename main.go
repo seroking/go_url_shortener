@@ -2,25 +2,22 @@ package main
 
 import (
 	"url_shortener/database"
-	"url_shortener/handlers"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	database.Connect()
 	database.SeedAdmin(database.DB)
-	r := gin.Default()
+	// r := gin.Default()
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "pong"})
-	})
+	// r.GET("/ping", func(c *gin.Context) {
+	// 	c.JSON(200, gin.H{"message": "pong"})
+	// })
 
-	r.POST("/signup", func(c *gin.Context) {
-		handlers.SignupHandler(c, database.DB)
-	})
-	r.POST("/signin", func(c *gin.Context) {
-		handlers.SigninHandler(c, database.DB)
-	})
-	r.Run(":8080")
+	// r.POST("/signup", func(c *gin.Context) {
+	// 	handlers.SignupHandler(c, database.DB)
+	// })
+	// r.POST("/signin", func(c *gin.Context) {
+	// 	handlers.SigninHandler(c, database.DB)
+	// })
+	// r.Run(":8080")
 }
