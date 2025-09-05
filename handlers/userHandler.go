@@ -9,25 +9,25 @@ import (
 )
 
 func CreateUser(c *gin.Context, db *gorm.DB) {
-	var input struct {
+	var Input struct {
 		Username string `json:"username"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-	if err := c.ShouldBindJSON(&input); err != nil {
+	if err := c.ShouldBindJSON(&Input); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(Input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "failed to hash password"})
 		return
 	}
 
 	user := models.User{
-		Username:     input.Username,
-		Email:        input.Email,
+		Username:     Input.Username,
+		Email:        Input.Email,
 		PasswordHash: string(hashedPassword),
 	}
 
@@ -67,24 +67,24 @@ func UpdateUser(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	var input struct {
+	var Input struct {
 		Username string `json:"username"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
+	if err := c.ShouldBindJSON(&Input); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
 	updates := map[string]interface{}{
-		"username": input.Username,
-		"email":    input.Email,
+		"username": Input.Username,
+		"email":    Input.Email,
 	}
 
-	if input.Password != "" {
-		passwordHash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	if Input.Password != "" {
+		passwordHash, err := bcrypt.GenerateFromPassword([]byte(Input.Password), bcrypt.DefaultCost)
 		if err != nil {
 			c.JSON(400, gin.H{"error": "failed to hash the new password"})
 			return
