@@ -109,3 +109,72 @@ func DeleteUser(c *gin.Context, db *gorm.DB) {
 	db.Delete(&user)
 	c.JSON(200, gin.H{"message": "User deleted successfully"})
 }
+
+func GetUserProfile(c *gin.Context, db *gorm.DB) {
+	var user models.User
+	id, exist := c.Get("user_id")
+	if !exist {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	if err := db.First(&user, id).Error; err != nil {
+		c.JSON(404, gin.H{"error": "User not found"})
+		return
+	}
+
+	response := gin.H{
+		"id":         user.ID,
+		"username":   user.Username,
+		"email":      user.Email,
+		"created_at": user.CreatedAt,
+	}
+
+	c.JSON(200, gin.H{"message": "sucess", "data": response})
+}
+
+func UpdateUserProfile(c *gin.Context, db *gorm.DB) {
+	var user models.User
+	var updatedUser struct {
+		Username string `json:"username"`
+		Email    string `json:"email"`
+	}
+	id, exist := c.Get("user_id")
+
+	if !exist {
+		c.JSON(401, gin.H{"errors": "Unauthorized"})
+		return
+	}
+
+	if err := db.First(&user, id).Error; err != nil {
+		c.JSON(404, gin.H{"errors": "User not found"})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&updatedUser); err != nil {
+		c.JSON(400, gin.H{"error": "Invalid data"})
+		return
+	}
+
+	if updatedUser.Username != "" {
+
+		user.Username = updatedUser.Username
+	}
+
+	if updatedUser.Email != "" {
+		user.Email = updatedUser.Email
+	}
+
+	if err := db.Save(&user).Error; err != nil {
+		c.JSON(500, gin.H{"error": "Failed to update user"})
+	}
+
+	response := gin.H{
+		"id":       user.ID,
+		"username": user.Username,
+		"email":    user.Email,
+		"message":  "Profile updated successfully",
+	}
+
+	c.JSON(200, response)
+}

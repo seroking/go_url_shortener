@@ -7,12 +7,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func adminOnly(db *gorm.DB) gin.HandlerFunc {
+func AdminOnly(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user models.User
 		user_id, exist := c.Get("user_id")
 		if !exist {
-			c.JSON(400, gin.H{"error": "Invalid user_id"})
+			c.JSON(400, gin.H{"error": "Invalid user id"})
 			return
 		}
 

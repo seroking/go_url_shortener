@@ -3,6 +3,7 @@ package routes
 import (
 	"url_shortener/database"
 	"url_shortener/handlers"
+	"url_shortener/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,22 +17,46 @@ func setupRoutes(router *gin.Engine) {
 	public := router.Group("/api/v1")
 	{
 
-		router.POST("/signup", func(c *gin.Context) {
+		public.POST("/signup", func(c *gin.Context) {
 			handlers.SignupHandler(c, database.DB)
 		})
 
-		router.POST("/signin", func(c *gin.Context) {
+		public.POST("/signin", func(c *gin.Context) {
 			handlers.SigninHandler(c, database.DB)
 		})
 
 	}
+	protected := router.Group("/api/v1")
+	protected.Use(middlewares.AuthenticationMiddleware())
 
-	router.PUT("/user/:id", func(c *gin.Context) {
-		handlers.UpdateUser(c, database.DB)
-	})
+	{
+		//User profile routes (regular authenticated users)
+		protected.GET("/profile", func(c *gin.Context) {
+			handlers.GetUserProfile(c, database.DB)
+		})
+		protected.PUT("/profile", func(c *gin.Context) {
+			handlers.UpdateUserProfile(c, database.DB)
+		})
 
-	router.DELETE("/user/:id", func(c *gin.Context) {
-		handlers.DeleteUser(c, database.DB)
-	})
+		adminRoutes := protected.Group("")
+		adminRoutes.Use(middlewares.AdminOnly(database.DB))
+		{
+			adminRoutes.GET("/users", func(c *gin.Context) {
+				handlers.ListUsers(c, database.DB)
+			})
 
+			adminRoutes.GET("/users/:id", func(c *gin.Context) {
+				handlers.GetUser(c, database.DB)
+			})
+
+			adminRoutes.PUT("/users/:id", func(c *gin.Context) {
+				handlers.UpdateUser(c, database.DB)
+			})
+
+			adminRoutes.DELETE("/users/:id", func(c *gin.Context) {
+				handlers.DeleteUser(c, database.DB)
+			})
+		}
+
+	}
 }
