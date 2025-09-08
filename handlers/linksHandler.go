@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateLink(c *gin.Context, db gorm.DB) {
+func CreateLink(c *gin.Context, db *gorm.DB) {
 	var Input struct {
 		OriginalUrl string `json:"url"`
 	}
@@ -61,15 +61,15 @@ func DeleteLink(c *gin.Context, db *gorm.DB) {
 	// 	return
 	// }
 
-	if err := db.Preload("User").First(&link, id); err != nil {
-		c.JSON(404, gin.H{"error": err})
+	if err := db.Preload("User").First(&link, id).Error; err != nil {
+		c.JSON(404, gin.H{"error": err.Error()})
 		return
 	}
 	userIDFloat := userID.(float64)
 	userIDVal := uint(userIDFloat)
 
 	if link.User.Role != "admin" && link.UserID != userIDVal {
-		c.JSON(401, gin.H{"error": "Forbidden"})
+		c.JSON(403, gin.H{"error": "Forbidden"})
 		return
 	}
 
@@ -93,5 +93,18 @@ func ListUserLinks(c *gin.Context, db *gorm.DB) {
 
 	db.Where("user_id = ?", userIDVal).Find(&links)
 
-	c.JSON(200, gin.H{"message": "links retrieved successfullt", "data": links})
+	c.JSON(200, gin.H{"message": "links retrieved successfully", "data": links})
+}
+
+func RedirectOriginalUrl(c *gin.Context, db *gorm.DB) {
+	shortcode := c.Param("shortcode")
+	var link models.Link
+
+	if err := db.Where("short_code = ?", shortcode).First(&link).Error; err != nil {
+		c.JSON(404, gin.H{"error": "Link Not Found"})
+		return
+	}
+
+	OriginalUrl := link.OriginalUrl
+	c.Redirect(302, OriginalUrl)
 }
