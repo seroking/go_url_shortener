@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"strconv"
+	"strings"
 	"url_shortener/helpers"
 	"url_shortener/models"
 
@@ -29,6 +30,11 @@ func CreateLink(c *gin.Context, db *gorm.DB) {
 
 	userIDVal := uint(userIDFloat)
 
+	if !strings.HasPrefix(Input.OriginalUrl, "http://") && !strings.HasPrefix(Input.OriginalUrl, "https://") {
+		c.JSON(400, gin.H{"error": "invalid link format"})
+		return
+	}
+
 	link = models.Link{
 		OriginalUrl: Input.OriginalUrl,
 		UserID:      userIDVal,
@@ -44,7 +50,7 @@ func CreateLink(c *gin.Context, db *gorm.DB) {
 		c.JSON(500, gin.H{"error": "failed to save database"})
 		return
 	}
-
+	c.JSON(200, "Link created successfully")
 }
 
 func DeleteLink(c *gin.Context, db *gorm.DB) {
@@ -104,7 +110,11 @@ func RedirectOriginalUrl(c *gin.Context, db *gorm.DB) {
 		c.JSON(404, gin.H{"error": "Link Not Found"})
 		return
 	}
-
+	link.Clicks += 1
+	if err := db.Save(&link).Error; err != nil {
+		c.JSON(400, gin.H{"error": "failed to update clicks"})
+		return
+	}
 	OriginalUrl := link.OriginalUrl
 	c.Redirect(302, OriginalUrl)
 }
