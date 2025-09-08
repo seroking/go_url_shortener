@@ -1,4 +1,3 @@
-
 # Go URL Shortener
 
 [![Go Version](https://img.shields.io/badge/go-1.25-blue)](https://golang.org/)
@@ -22,10 +21,13 @@ This application allows users to shorten URLs, track clicks, and manage their li
 ---
 
 ## 🖼 Architecture Overview
+
+```
 User --> Shorten URL --> Store in Database --> Generate Shortcode
 |
 v
 Visit Shortcode --> Lookup Original URL --> Redirect & Increment Clicks
+```
 
 ## 📦 Tech Stack
 
@@ -43,98 +45,116 @@ Visit Shortcode --> Lookup Original URL --> Redirect & Increment Clicks
 ```bash
 git clone https://github.com/yourusername/go-url-shortener.git
 cd go-url-shortener
+```
 
-2. Install dependencies
+### 2. Install dependencies
+```bash
 go mod tidy
+```
 
-3. Setup environment
-
-Create a .env file with:
+### 3. Setup environment
+Create a `.env` file with:
+```env
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=password
 DB_NAME=url_shortener
 JWT_SECRET=your_secret_key
+```
 
+### 4. Run migrations
+```bash
+go run main.go
+```
 
-4. Run migrations
+### 5. Start the server
+```bash
 go run main.go
-5. Start the server
-go run main.go
+```
 
 Server runs on: http://localhost:8080
 
-🔗 API Endpoints
-Public
+---
 
-POST /api/v1/signup – Create a new user
+## 🔗 API Endpoints
 
-POST /api/v1/signin – Authenticate user
+### Public
 
-GET /api/v1/:shortcode – Redirect to original URL
+- `POST /api/v1/signup` – Create a new user
+- `POST /api/v1/signin` – Authenticate user
+- `GET /api/v1/:shortcode` – Redirect to original URL
 
-Protected (JWT required)
+### Protected (JWT required)
 
-GET /api/v1/links – List user’s links
+- `GET /api/v1/links` – List user's links
+- `POST /api/v1/links` – Create a new short link
+- `DELETE /api/v1/links/:id` – Delete your link
+- `GET /api/v1/profile` – Get user profile
+- `PUT /api/v1/profile` – Update user profile
 
-POST /api/v1/links – Create a new short link
+### Admin (JWT + admin role)
 
-DELETE /api/v1/links/:id – Delete your link
+- `GET /api/v1/users` – List all users
+- `GET /api/v1/users/:id` – Get user by ID
+- `PUT /api/v1/users/:id` – Update user
+- `DELETE /api/v1/users/:id` – Delete user
 
-GET /api/v1/profile – Get user profile
+---
 
-PUT /api/v1/profile – Update user profile
+## ⚡ Example cURL Requests
 
-Admin (JWT + admin role)
-
-GET /api/v1/users – List all users
-
-GET /api/v1/users/:id – Get user by ID
-
-PUT /api/v1/users/:id – Update user
-
-DELETE /api/v1/users/:id – Delete user
-
-⚡ Example cURL Requests
-
-Signup
+### Signup
+```bash
 curl -X POST http://localhost:8080/api/v1/signup \
--H "Content-Type: application/json" \
--d '{"username":"sero","email":"sero@example.com","password":"password"}'
+  -H "Content-Type: application/json" \
+  -d '{"username":"sero","email":"sero@example.com","password":"password"}'
+```
 
-Signin
+### Signin
+```bash
 curl -X POST http://localhost:8080/api/v1/signin \
--H "Content-Type: application/json" \
--d '{"email":"sero@example.com","password":"password"}'
-Create a link
+  -H "Content-Type: application/json" \
+  -d '{"email":"sero@example.com","password":"password"}'
+```
+
+### Create a link
+```bash
 curl -X POST http://localhost:8080/api/v1/links \
--H "Authorization: Bearer <TOKEN>" \
--H "Content-Type: application/json" \
--d '{"url":"https://example.com"}'
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://example.com"}'
+```
 
-List user links
+### List user links
+```bash
 curl -X GET http://localhost:8080/api/v1/links \
--H "Authorization: Bearer <TOKEN>"
+  -H "Authorization: Bearer <TOKEN>"
+```
 
-Delete a link
+### Delete a link
+```bash
 curl -X DELETE http://localhost:8080/api/v1/links/1 \
--H "Authorization: Bearer <TOKEN>"
+  -H "Authorization: Bearer <TOKEN>"
+```
 
-Redirect via shortcode
+### Redirect via shortcode
+```bash
 curl -L http://localhost:8080/api/v1/abcd1234
-📝 Notes
+```
 
-Clicks are tracked automatically when a short URL is visited.
+---
 
-Shortcodes are generated automatically based on the database ID.
+## 📝 Notes
 
-Only the owner or an admin can delete links.
+- Clicks are tracked automatically when a short URL is visited.
+- Shortcodes are generated automatically based on the database ID.
+- Only the owner or an admin can delete links.
+- Original URLs are validated to start with `http://` or `https://`.
+- The app is designed for demonstration/portfolio purposes.
 
-Original URLs are validated to start with http:// or https://.
+---
 
-The app is designed for demonstration/portfolio purposes.
+## 📌 License
 
-📌 License
-
-This project is licensed under the MIT License. See the LICENSE
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
