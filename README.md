@@ -154,7 +154,8 @@ curl -L http://localhost:8080/api/v1/abcd1234
 - The app is designed for demonstration/portfolio purposes.
 
 ---
-
+## inspo: 
+- https://roadmap.sh/projects/url-shortening-service
 ## 📌 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
